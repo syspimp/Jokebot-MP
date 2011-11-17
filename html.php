@@ -17,7 +17,7 @@
 			<li><a href="<?php echo "$PHP_SELF"; ?>?format=json">JSON</a></li>
 			<li><a href="<?php echo "$PHP_SELF"; ?>?format=xml">XML</a></li>
 			<li><a href="<?php echo "$PHP_SELF"; ?>?format=text">Text</a></li>
-			<li><a href="#">About</a></li>
+			<li><a href="http://github.com/syspimp/Jokebot-MP">About</a></li>
 			<li><a href="#">Add a Joke</a></li>
 			<li><a href="#">Subscribe</a></li>
 			<li><a href="#">Contact us</a></li>
