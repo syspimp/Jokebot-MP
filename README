@@ -1,0 +1,67 @@
+Jokebot MP
+
+Description:
+A jokebot written for Mongo DB and PHP
+
+Version:
+1.0
+
+History:
+I like jokes, and I use a lot of command line tools.  I put a few jokes in my scripts, but wouldn't it be nice to pass a -j flag and get a random joke?  I looked around on the internet and didn't find a "joke api", so I decided to make one.  It only took me a couple of hours, with the longest part being formating the jokes for the initial import.
+
+Jokebot can output a random joke in xml, html, plain text, and json format.  For a plain text shell example:
+
+curl http://jokes.tfound.org/jokebot/?format=text
+
+The format parameter can take xml,html,text, or json.  Everything else is ignored.
+
+Requirements:
+mongo db 
+You need mongo running locally, on default port of 27017.
+
+php 5.3
+php pecl mongo driver
+
+Setting up mongo is beyond the scope of this document.
+
+Installation:
+* Copy all files into a folder under your webroot, ie:
+* Change to that directory
+* Run php ./jokebot-init.php .  It dumps some output so you could visit this in a web browser, too, but output is not formatted for html.
+* Visit http://yoursite/jokebot/ or run php ./index.php and enjoy a joke.
+* Set up your scripts to output a joke
+
+Setup example:
+
+# change to your git export/tarball extract
+cd Jokebot-MP
+mkdir -p /var/www/html/jokebot
+mv ./* /var/www/html/jokebot/
+cd /var/www/html/jokebot
+php ./jokebot-init.php
+# init output
+php ./index.php
+
+
+Shell script example, using curl. save as randomjoke.sh, chmod 755 randomjoke.sh, and run it.
+
+cat >randomjoke.sh<<-EOF
+
+#!/bin/bash
+# random joke teller
+
+while getopts "j:" OPTION
+do
+    case ${OPTION} in
+        j)
+		curl http://jokes.tfound.org/jokes/?format=text
+		exit 0
+		;;
+    esac
+done
+EOF
+chmod 755 randomjoke.sh
+./randomjoke.sh -j
+
+
+Enjoy.
