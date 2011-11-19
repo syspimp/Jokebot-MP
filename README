@@ -46,6 +46,7 @@ php ./index.php
 Shell script example, using curl. save as randomjoke.sh, chmod 755 randomjoke.sh, and run it.
 
 cat >randomjoke.sh<<-EOF
+
 #!/bin/bash
 # random joke teller
 
@@ -53,7 +54,7 @@ while getopts "j:" OPTION
 do
     case ${OPTION} in
         j)
-		curl http://jokes.tfound.org/jokebot/?format=text
+		curl http://jokes.tfound.org/jokes/?format=text
 		exit 0
 		;;
     esac

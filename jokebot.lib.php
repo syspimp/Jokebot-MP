@@ -118,14 +118,17 @@ function getjoke($jokeid=0)
 	}
 	$mongo = new Mongo();
 	$collection = $mongo->jokes->jokes;
-	return $collection->findOne(array("_id" => $jokeid));
+	$joke = $collection->findOne(array("_id" => $jokeid));
+    	$cat = $collection->getDBRef($joke['category']);
+    	$joke['category'] = $cat['name'];
+	return $joke; 
 }
 function getrandomjokeid()
 {
 	$mongo = new Mongo();
 	$collection = $mongo->jokes->jokes;
-	$count = $collection->find()->count();
-	$jokeid = $collection->findOne(array("_id" => rand(0,$count)));
+	$count = $collection->find()->count() - 1;
+	$jokeid = $collection->findOne(array("_id" => rand(1,$count)));
 	return $jokeid['_id'];
 	
 }
@@ -134,8 +137,8 @@ function getrandomcatid()
 {
 	$mongo = new Mongo();
 	$collection = $mongo->jokes->categories;
-	$count = $collection->find()->count();
-	$catid = $collection->findOne(array("_id" => rand(0,$count)));
+	$count = $collection->find()->count() - 1;
+	$catid = $collection->findOne(array("_id" => rand(1,$count)));
 	return $catid['_id'];
 	
 }
