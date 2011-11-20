@@ -1,11 +1,12 @@
 <?php
 
-$categories = array( "Animal Jokes","Bar jokes","Blonde jokes","Bumper stickers","Computer jokes","Farmers","Gender","Insults","Lawyer jokes","Kids jokes","Medical jokes","One liners","Redneck","Work jokes","Holiday jokes");
-$i=0;
+$categories = array( "Animal Jokes","Bar jokes","Blonde jokes","Bumper stickers","Computer jokes","Farmers","Gender","Insults","Lawyer jokes","Kids jokes","Medical jokes","One liners","Redneck","Work jokes","Holiday jokes","Yo Mama");
+$i=1;
 foreach($categories as $category) {
   $data[] = array( "_id" => $i, "name" => $category);
   $i++;
 }
+
 $jokes[]=array(1, 'Twas the Month after Chanukah...', 15, 0, '\'Twas the Month after Chanukah 
 
 Twas the month after Chanukah, and all through the house 
@@ -514,43 +515,62 @@ Unwrapping the brownie, the guy takes a bite; suddenly, the guys spits it out an
 
 "It is," replied the salesman. "Wanna buy some mouthwash?"', 'n/a', 1075964025, 'T', 'approved');
 
-echo "Importing joke categories into mongo"
+echo "Importing joke categories into mongo";
 try {
 	$mongo = new Mongo();
 	$collection = $mongo->jokes->categories;
 	$collection->drop();
 	$collection->batchInsert($data);
-	echo "Joke categories import complete!"
+	echo "Joke categories import complete!";
 } catch (Exception $e) {
     	echo 'Caught exception on joke categories import: ',  $e->getMessage(), "\n";
 }
+# import from file
+#$handle = @fopen("jokes.txt", "r");
+#$id=46;
+#if ($handle) {
+#    while (($buffer = fgets($handle, 4096)) !== false) {
+#       $jokes[]=array($id,'Yo mama', 16,'',strip_tags($buffer)) ;
+#    	$id++;
+#    }
+#    if (!feof($handle)) {
+#        echo "Error: unexpected fgets() fail\n";
+#    }
+#    fclose($handle);
+#}
 
-echo "Linking jokes to categories .."
+$timestamp=time();
+echo "Linking jokes to categories ..";
 try {
 	foreach($jokes as $joke) {
-  		$catref = $collection->find(array("_id" => $joke[2]));
-  		$jokeref = MongoDBRef::create("categories", $catref["_id"]);
+  		$catrefcursor = $collection->find(array("_id" => $joke[2]));
+		foreach ($catrefcursor as $catref)
+		{
+  			$jokeref[] = MongoDBRef::create("categories", $catref["_id"]);
+		}
   		$jokedata[] = array( 	"_id" => $joke[0],"title" => $joke[1],
   						"category" => $jokeref,
   						"text" => $joke[4],
-  						"timestamp" => $joke[6]
+						"author" => "Anonymous",
+  						"timestamp" => $timestamp
   		);
+		unset($jokeref);
 	}
 } catch (Exception $e) {
         echo 'Caught exception linking joke categories',  $e->getMessage(), "\n";
 }
 
-echo "Importing jokes into mongo"
+echo "Importing jokes into mongo";
 try {
 	$collection2= $mongo->jokes->jokes;
 	$collection2->drop();
 	$collection2->batchInsert($jokedata);
-	echo "Joke import complete!"
+	echo "Joke import complete!";
 } catch (Exception $e) {
         echo 'Caught exception on joke import: ',  $e->getMessage(), "\n";
 }
 
-echo "Showing categories:"
+echo "Showing categories:";
 $categories2 = $collection->find()->sort(array("_id" => 1));
 foreach ($categories2 as $category2) {
 	echo "categories:";
@@ -558,7 +578,7 @@ foreach ($categories2 as $category2) {
 }
 
 
-echo "Showing jokes:"
+echo "Showing jokes:";
 $jdump = $collection2->find()->sort(array("_id" => 1));
 foreach ($jdump as $j) {
 	echo "jokes:";

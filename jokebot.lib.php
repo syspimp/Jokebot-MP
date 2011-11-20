@@ -1,18 +1,12 @@
 <?php 
+require_once('jokebot.config.php');
 
-$appkey=1234;
-$action='get';
-$catid=0;
-$jokeid=0;
-$format='html';
-
-# init, these variables can be changed by sending as a get request
+# for shell use
 if(!empty($_SERVER['SHELL']))
 {
-	$PHP_SELF="index.php";
 	$format = isset($argv[1]) ? $argv[1] : 'text';
 }
-$configvars = array('format','appkey','action','catid','jokeid');
+
 foreach($configvars as $var)
 {
 	if (isset($_GET[$var])) {
@@ -84,7 +78,9 @@ function displayjoke($joke)
 		echo "\n".$joke['title'] ."\n\n". $joke['text'] ."\n";
 		break;
 		case 'html':
-		include('html.php');
+		$joke['text'] = htmlentities($joke['text']);
+		$joke['title'] = htmlentities($joke['title']);
+		include('jokebot.html.php');
 		#$text=str_replace("\n","<br />\n",$joke['text']);
 		#echo "<html>\n<body>\n<title>".$joke['title']."</title>\n"
 		#. "<p>".$joke['title']."</p>\n"
@@ -111,6 +107,13 @@ function getjokebycat($catid=0)
 	$collection = $mongo->jokes->jokes;
 	return $collection->findOne(array("category" => $catid));
 }
+function getallcats()
+{
+	
+	$mongo = new Mongo();
+	$collection = $mongo->jokes->categories;
+	return $collection->find();
+}
 function getjoke($jokeid=0)
 {
 	if ($jokeid==0){
@@ -119,8 +122,10 @@ function getjoke($jokeid=0)
 	$mongo = new Mongo();
 	$collection = $mongo->jokes->jokes;
 	$joke = $collection->findOne(array("_id" => $jokeid));
-    	$cat = $collection->getDBRef($joke['category']);
-    	$joke['category'] = $cat['name'];
+	foreach( $joke['category'] as $jokecat ) {
+		$cat[] = $collection->getDBRef($jokecat);
+	}
+    	$joke['category'] = $cat;
 	return $joke; 
 }
 function getrandomjokeid()
@@ -141,6 +146,39 @@ function getrandomcatid()
 	$catid = $collection->findOne(array("_id" => rand(1,$count)));
 	return $catid['_id'];
 	
+}
+function insertjoke($data)
+{
+	if (empty($data['text']) || empty($data['title']) || empty($data['category'])) {
+		throw new Exception('Title, Text, or Category can not be empty.');
+	}
+	if (!isset($data['author']) || empty($data['author'])) {
+		$data['author'] = 'Anonymous';
+	}
+	$mongo = new Mongo();
+	$collection = $mongo->jokes->jokes;
+	$collection = $mongo->jokes->categories;
+	$data['_id'] = $collection->find()->count();
+	try {
+		$collection->insert($data);
+		return $data;
+	}
+	catch (Exception $e) {
+		echo 'Caught exception inserting row: ',  $e->getMessage(), "\n";
+	}
+		
+	
+}
+function cleaninputforinsert($data)
+{
+	global $postvars;
+	foreach($postvars as $var)
+	{
+        	if (isset($_POST[$var])) {
+                	$userinput[$var] = strip_tags($_POST[$var]);
+        	}
+	}
+	return $userinput;
 }
 function checkappkey($key)
 {
