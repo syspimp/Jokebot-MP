@@ -54,7 +54,7 @@ while getopts "j:" OPTION
 do
     case ${OPTION} in
         j)
-		curl http://jokes.tfound.org/jokes/?format=text
+		curl http://jokes.tfound.org/jokebot/?format=text
 		exit 0
 		;;
     esac
