@@ -1,0 +1,1 @@
+PHP_INI_SCAN_DIR=/etc/opt/rh/rh-php70/php.d:/opt/app-root/php.d

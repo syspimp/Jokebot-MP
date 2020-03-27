@@ -1,0 +1,13 @@
+echo "Installing mongodb module"
+cd /opt/app-root/
+pecl bundle mongodb
+cd mongodb
+phpize
+./configure -q
+make
+mkdir /opt/app-root/php.d
+echo "extension=/opt/app-root/mongodb/modules/mongodb.so" >> /opt/app-root/php.d/mongodb.ini
+cd /opt/app-root/src/
+
+echo "Running assemble script"
+/usr/libexec/s2i/assemble
