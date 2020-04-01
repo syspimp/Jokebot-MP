@@ -9,7 +9,7 @@ echo "Installing mongodb module"
 #echo "extension=/opt/app-root/mongodb/modules/mongodb.so" >> /opt/app-root/php.d/mongodb.ini
 #cd /opt/app-root/src/
 
-yum -y install php-pecl-mongodb
+#yum -y install php-pecl-mongodb
 
 echo "Running assemble script"
 /usr/libexec/s2i/assemble
